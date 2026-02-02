@@ -6,6 +6,12 @@ import com.ecommerce.project.model.Category;
 import com.ecommerce.project.payload.CategoryDTO;
 import com.ecommerce.project.payload.CategoryResponse;
 import com.ecommerce.project.service.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +29,8 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
+    @Tag(name = "Category APIs", description = "APIs for managing categories")
+    @Operation(summary = "Get categories", description = "APIs for getting all categories")
     @GetMapping("/api/public/categories")
     public ResponseEntity<CategoryResponse> getAllCategories(
             @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
@@ -34,6 +42,13 @@ public class CategoryController {
         return new  ResponseEntity<>(categoryResponse, HttpStatus.OK);
     }
 
+    @Tag(name = "Category APIs", description = "APIs for managing categories")
+    @Operation(summary = "Create category", description = "API to create a new category")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Category is created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid Input", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server error", content = @Content)
+    })
     @PostMapping("/api/public/categories")
     public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody CategoryDTO categoryDTO){
         CategoryDTO savedCategoryDTO = categoryService.createCategory(categoryDTO);
@@ -41,15 +56,19 @@ public class CategoryController {
 
     }
 
+    @Tag(name = "Category APIs", description = "APIs for managing categories")
+    @Operation(summary = "Delete Category", description = "API to delete category with category id")
     @DeleteMapping("/api/admin/categories/{categoryId}")
-    public ResponseEntity<CategoryDTO> deleteCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<CategoryDTO> deleteCategory(@Parameter(description = "Id of the Category you wish to delete") @PathVariable Long categoryId) {
         CategoryDTO deleteCategory = categoryService.deleteCategory(categoryId);
         return new ResponseEntity<>(deleteCategory, HttpStatus.OK);
     }
 
 
+    @Tag(name = "Category APIs", description = "APIs for managing categories")
+    @Operation(summary = "Update Category", description = "API to update with category id")
     @PutMapping("/api/public/categories/{categoryId}")
-    public ResponseEntity<CategoryDTO> updateCategory(@Valid @RequestBody CategoryDTO categoryDTO, @PathVariable Long categoryId){
+    public ResponseEntity<CategoryDTO> updateCategory(@Parameter(description = "Id of the category you wish to update") @Valid @RequestBody CategoryDTO categoryDTO, @PathVariable Long categoryId){
             CategoryDTO savedCategoryDTO = categoryService.updateCategory(categoryDTO, categoryId);
             return new ResponseEntity<>(savedCategoryDTO, HttpStatus.OK);
         }
